@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id           String   @id @default(cuid())
+  name         String
+  avatar       String?
+  systemPrompt String
+  description  String?
+  skills       String   @default("[]")
+  config       String   @default("{}")
+  squadId      String?
+  squad        Squad?   @relation(fields: [squadId], references: [id])
+  conversations Conversation[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Squad {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  color        String?
+  agents       Agent[]
+  conversations Conversation[]
+  createdAt    DateTime @default(now())
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  title     String?
+  agentId   String?
+  agent     Agent?    @relation(fields: [agentId], references: [id])
+  squadId   String?
+  squad     Squad?    @relation(fields: [squadId], references: [id])
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String
+  content        String
+  agentId        String?
+  metadata       String?
+  attachments    String?
+  createdAt      DateTime     @default(now())
+}
+
+model CreativeOutput {
+  id             String   @id @default(cuid())
+  type           String
+  prompt         String
+  agentId        String
+  conversationId String?
+  images         String   @default("[]")
+  textContent    String?
+  metadata       String?
+  createdAt      DateTime @default(now())
+}
+
+model VaultCache {
+  id         String   @id @default(cuid())
+  filePath   String   @unique
+  content    String
+  lastSynced DateTime
+}
