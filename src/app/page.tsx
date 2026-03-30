@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 const statCards = [
   {
-    label: 'Total Agents',
+    label: 'Total de Agentes',
     value: mockStats.totalAgents,
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -17,7 +17,7 @@ const statCards = [
     bg: 'bg-accent/10',
   },
   {
-    label: 'Active Squads',
+    label: 'Squads Ativos',
     value: mockStats.totalSquads,
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -28,7 +28,7 @@ const statCards = [
     bg: 'bg-indigo-500/10',
   },
   {
-    label: 'Conversations',
+    label: 'Conversas',
     value: mockStats.totalConversations,
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -39,7 +39,7 @@ const statCards = [
     bg: 'bg-emerald-500/10',
   },
   {
-    label: 'Creatives Generated',
+    label: 'Criativos Gerados',
     value: mockStats.totalCreatives,
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -54,37 +54,37 @@ const statCards = [
 const recentActivities = [
   {
     id: 1,
-    action: 'Creative generated',
-    detail: 'Carrossel sobre Pomodoro by Carrossel Master',
-    time: '2 hours ago',
+    action: 'Criativo gerado',
+    detail: 'Carrossel sobre Pomodoro por Carrossel Master',
+    time: '2 horas atrás',
     icon: '🎨',
   },
   {
     id: 2,
-    action: 'Conversation started',
-    detail: `"${mockConversations[0].title}" with Roteirizador`,
-    time: '3 hours ago',
+    action: 'Conversa iniciada',
+    detail: `"${mockConversations[0].title}" com Roteirizador`,
+    time: '3 horas atrás',
     icon: '💬',
   },
   {
     id: 3,
-    action: 'Creative generated',
-    detail: 'Ad creative for productivity course by Ad Creative',
-    time: '1 day ago',
+    action: 'Criativo gerado',
+    detail: 'Ad creative para curso de produtividade por Ad Creative',
+    time: '1 dia atrás',
     icon: '🎨',
   },
   {
     id: 4,
-    action: 'Agent created',
-    detail: `${mockAgents[4].name} joined the team`,
-    time: '3 days ago',
+    action: 'Agente criado',
+    detail: `${mockAgents[4].name} entrou no time`,
+    time: '3 dias atrás',
     icon: '🤖',
   },
   {
     id: 5,
-    action: 'Squad created',
-    detail: 'Ads Machine squad assembled',
-    time: '6 days ago',
+    action: 'Squad criado',
+    detail: 'Squad Ads Machine montado',
+    time: '6 dias atrás',
     icon: '👥',
   },
 ];
@@ -93,19 +93,19 @@ const activeAgents = [
   {
     agent: mockAgents[0],
     status: 'responding' as const,
-    task: 'Generating reels script about morning routines',
+    task: 'Gerando roteiro de reels sobre rotina matinal',
   },
   {
     agent: mockAgents[3],
     status: 'thinking' as const,
-    task: 'Analyzing trending topics for viral content',
+    task: 'Analisando tópicos em alta para conteúdo viral',
   },
 ];
 
 const statusConfig: Record<string, { label: string; variant: 'success' | 'warning' | 'accent' }> = {
-  idle: { label: 'Idle', variant: 'warning' },
-  thinking: { label: 'Thinking...', variant: 'accent' },
-  responding: { label: 'Responding', variant: 'success' },
+  idle: { label: 'Ocioso', variant: 'warning' },
+  thinking: { label: 'Pensando...', variant: 'accent' },
+  responding: { label: 'Respondendo', variant: 'success' },
 };
 
 export default function DashboardPage() {
@@ -113,8 +113,8 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
-        <p className="text-sm text-text-secondary mt-1">Overview of your AI agent operations</p>
+        <h1 className="text-2xl font-bold text-text-primary">Painel</h1>
+        <p className="text-sm text-text-secondary mt-1">Visão geral das operações dos seus agentes IA</p>
       </div>
 
       {/* Stats Row */}
@@ -139,7 +139,7 @@ export default function DashboardPage() {
         {/* Recent Activity Feed */}
         <Card padding="none" className="overflow-hidden">
           <div className="p-5 border-b border-border">
-            <h2 className="text-base font-semibold text-text-primary">Recent Activity</h2>
+            <h2 className="text-base font-semibold text-text-primary">Atividade Recente</h2>
           </div>
           <div className="divide-y divide-border">
             {recentActivities.map((activity) => (
@@ -160,8 +160,8 @@ export default function DashboardPage() {
           {/* Agent Activity Monitor */}
           <Card padding="none" className="overflow-hidden">
             <div className="p-5 border-b border-border flex items-center justify-between">
-              <h2 className="text-base font-semibold text-text-primary">Agent Activity Monitor</h2>
-              <Badge variant="accent" size="sm">{mockStats.activeAgents} active</Badge>
+              <h2 className="text-base font-semibold text-text-primary">Monitor de Atividade</h2>
+              <Badge variant="accent" size="sm">{mockStats.activeAgents} ativos</Badge>
             </div>
             <div className="divide-y divide-border">
               {activeAgents.map(({ agent, status, task }) => {
@@ -191,21 +191,21 @@ export default function DashboardPage() {
               })}
               {/* Idle agents summary */}
               <div className="p-4 text-xs text-text-tertiary text-center">
-                {mockStats.totalAgents - mockStats.activeAgents} other agents idle
+                {mockStats.totalAgents - mockStats.activeAgents} outros agentes ociosos
               </div>
             </div>
           </Card>
 
           {/* Quick Actions */}
           <Card>
-            <h2 className="text-base font-semibold text-text-primary mb-4">Quick Actions</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-4">Ações Rápidas</h2>
             <div className="grid grid-cols-3 gap-3">
               <Link href="/agents/new">
                 <Button variant="primary" size="md" className="w-full">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
-                  New Agent
+                  Novo Agente
                 </Button>
               </Link>
               <Link href="/squads/new">
@@ -213,7 +213,7 @@ export default function DashboardPage() {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
-                  New Squad
+                  Novo Squad
                 </Button>
               </Link>
               <Link href="/chat">
@@ -221,7 +221,7 @@ export default function DashboardPage() {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
                   </svg>
-                  Start Chat
+                  Iniciar Chat
                 </Button>
               </Link>
             </div>

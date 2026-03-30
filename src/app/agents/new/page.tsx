@@ -12,10 +12,10 @@ import type { AgentSkill } from '@/types';
 const AVATAR_OPTIONS = ['🎬', '🎠', '📢', '🔥', '🧠', '✍️', '📊', '🎯', '🚀', '💡', '🎨', '📱'];
 
 const SKILL_OPTIONS: { id: AgentSkill; label: string }[] = [
-  { id: 'vault_search', label: 'Vault Search' },
-  { id: 'read_vault_note', label: 'Read Vault Note' },
-  { id: 'generate_image', label: 'Generate Image' },
-  { id: 'web_search', label: 'Web Search' },
+  { id: 'vault_search', label: 'Busca no Vault' },
+  { id: 'read_vault_note', label: 'Ler Nota do Vault' },
+  { id: 'generate_image', label: 'Gerar Imagem' },
+  { id: 'web_search', label: 'Busca na Web' },
 ];
 
 const MODEL_OPTIONS = [
@@ -62,13 +62,13 @@ export default function NewAgentPage() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 p-6">
         <div className="text-5xl">{avatar}</div>
-        <h2 className="text-xl font-bold text-text-primary">Agent Created!</h2>
+        <h2 className="text-xl font-bold text-text-primary">Agente Criado!</h2>
         <p className="text-sm text-text-secondary">
-          <strong>{name}</strong> is ready to go. (Check console for details)
+          <strong>{name}</strong> está pronto. (Veja o console para detalhes)
         </p>
         <div className="flex gap-3 mt-2">
           <Link href="/agents">
-            <Button variant="secondary">Back to Agents</Button>
+            <Button variant="secondary">Voltar para Agentes</Button>
           </Link>
           <Button
             onClick={() => {
@@ -82,7 +82,7 @@ export default function NewAgentPage() {
               setMaxTokens(4096);
             }}
           >
-            Create Another
+            Criar Outro
           </Button>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function NewAgentPage() {
             <path d="M12 5l-5 5 5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
-        <h1 className="text-2xl font-bold text-text-primary">New Agent</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Novo Agente</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -125,8 +125,8 @@ export default function NewAgentPage() {
 
         {/* Name */}
         <Input
-          label="Name"
-          placeholder="e.g. Roteirizador"
+          label="Nome"
+          placeholder="ex: Roteirizador"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
@@ -134,8 +134,8 @@ export default function NewAgentPage() {
 
         {/* Description */}
         <Textarea
-          label="Description"
-          placeholder="What does this agent do?"
+          label="Descrição"
+          placeholder="O que esse agente faz?"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
@@ -143,8 +143,8 @@ export default function NewAgentPage() {
 
         {/* System Prompt */}
         <Textarea
-          label="System Prompt"
-          placeholder="You are an expert..."
+          label="Prompt do Sistema"
+          placeholder="Você é um especialista..."
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
           rows={8}
@@ -154,7 +154,7 @@ export default function NewAgentPage() {
 
         {/* Skills */}
         <Card>
-          <label className="text-sm font-medium text-text-primary block mb-3">Skills</label>
+          <label className="text-sm font-medium text-text-primary block mb-3">Habilidades</label>
           <div className="grid grid-cols-2 gap-2">
             {SKILL_OPTIONS.map((skill) => (
               <label
@@ -198,7 +198,7 @@ export default function NewAgentPage() {
             onChange={(e) => setSquadId(e.target.value)}
             className="h-10 px-3 text-sm bg-bg-primary border border-border rounded-[var(--radius-md)] text-text-primary outline-none transition-all duration-150 focus:border-accent focus:ring-2 focus:ring-accent/20"
           >
-            <option value="">No squad</option>
+            <option value="">Nenhum squad</option>
             {mockSquads.map((squad) => (
               <option key={squad.id} value={squad.id}>
                 {squad.name}
@@ -209,7 +209,7 @@ export default function NewAgentPage() {
 
         {/* Model */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-text-primary">Model</label>
+          <label className="text-sm font-medium text-text-primary">Modelo</label>
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
@@ -226,7 +226,7 @@ export default function NewAgentPage() {
         {/* Temperature */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-text-primary">
-            Temperature: <span className="text-accent font-mono">{temperature.toFixed(1)}</span>
+            Temperatura: <span className="text-accent font-mono">{temperature.toFixed(1)}</span>
           </label>
           <input
             type="range"
@@ -238,14 +238,14 @@ export default function NewAgentPage() {
             className="w-full accent-[var(--accent)]"
           />
           <div className="flex justify-between text-[10px] text-text-tertiary">
-            <span>Precise (0)</span>
-            <span>Creative (1)</span>
+            <span>Preciso (0)</span>
+            <span>Criativo (1)</span>
           </div>
         </div>
 
         {/* Max Tokens */}
         <Input
-          label="Max Tokens"
+          label="Máximo de Tokens"
           type="number"
           min={256}
           max={32768}
@@ -257,13 +257,13 @@ export default function NewAgentPage() {
         {/* Actions */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
           <Link href="/agents">
-            <Button type="button" variant="secondary">Cancel</Button>
+            <Button type="button" variant="secondary">Cancelar</Button>
           </Link>
           <Button type="submit">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-            Create Agent
+            Criar Agente
           </Button>
         </div>
       </form>

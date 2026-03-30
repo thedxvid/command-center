@@ -12,14 +12,14 @@ export default function SquadsPage() {
         <div>
           <h1 className="text-2xl font-bold text-text-primary">Squads</h1>
           <p className="text-sm text-text-secondary mt-1">
-            {mockSquads.length} squads configured
+            {mockSquads.length} squads configurados
           </p>
         </div>
         <Button>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          New Squad
+          Novo Squad
         </Button>
       </div>
 
@@ -59,7 +59,7 @@ export default function SquadsPage() {
                 ))}
               </div>
               <span className="text-xs text-text-tertiary">
-                {squad.agents.length} agent{squad.agents.length !== 1 ? 's' : ''}
+                {squad.agents.length} agente{squad.agents.length !== 1 ? 's' : ''}
               </span>
             </div>
 
@@ -84,7 +84,7 @@ export default function SquadsPage() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  Chat with Squad
+                  Conversar com Squad
                 </Button>
               </Link>
             </div>

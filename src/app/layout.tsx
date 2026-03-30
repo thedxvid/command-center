@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Command Center',
-  description: 'AI Agent Management System',
+  description: 'Sistema de Gestão de Agentes IA',
 };
 
 export default function RootLayout({

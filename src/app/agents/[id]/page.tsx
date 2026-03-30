@@ -54,9 +54,9 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
   if (!agent) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 p-6">
-        <p className="text-lg text-text-secondary">Agent not found</p>
+        <p className="text-lg text-text-secondary">Agente não encontrado</p>
         <Link href="/agents">
-          <Button variant="secondary">Back to Agents</Button>
+          <Button variant="secondary">Voltar para Agentes</Button>
         </Link>
       </div>
     );
@@ -142,7 +142,7 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
               <span className="text-5xl">{agent.avatar || '🤖'}</span>
               <h3 className="text-lg font-semibold text-text-primary">{agent.name}</h3>
               <p className="text-sm text-text-secondary max-w-md">
-                {agent.description || 'Start a conversation with this agent.'}
+                {agent.description || 'Inicie uma conversa com este agente.'}
               </p>
             </div>
           )}
@@ -208,14 +208,14 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={`Message ${agent.name}...`}
+              placeholder={`Mensagem para ${agent.name}...`}
               rows={1}
               className="flex-1 resize-none bg-transparent text-sm text-text-primary placeholder:text-text-tertiary outline-none max-h-40 py-1"
             />
             {/* Mic button */}
             <button
               className="shrink-0 p-1.5 text-text-tertiary hover:text-text-secondary transition-colors"
-              title="Voice (coming soon)"
+              title="Voz (em breve)"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M9 1.5a2.25 2.25 0 00-2.25 2.25v4.5a2.25 2.25 0 004.5 0v-4.5A2.25 2.25 0 009 1.5z" stroke="currentColor" strokeWidth="1.5" />
@@ -234,7 +234,7 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
             </button>
           </div>
           <p className="text-[10px] text-text-tertiary text-center mt-1.5">
-            Press Enter to send, Shift+Enter for new line
+            Enter para enviar, Shift+Enter para nova linha
           </p>
         </div>
       </div>
@@ -269,7 +269,7 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
 
           {/* Skills */}
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">Skills</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">Habilidades</p>
             <div className="flex flex-wrap gap-1.5">
               {agent.skills.map((skill) => (
                 <Badge key={skill} size="sm">
@@ -281,7 +281,7 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
 
           {/* System Prompt */}
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">System Prompt</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">Prompt do Sistema</p>
             <Card padding="sm" className="bg-bg-primary">
               <p className={`text-xs text-text-secondary font-mono whitespace-pre-wrap ${!systemPromptExpanded ? 'line-clamp-4' : ''}`}>
                 {agent.systemPrompt}
@@ -290,18 +290,18 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
                 onClick={() => setSystemPromptExpanded(!systemPromptExpanded)}
                 className="text-xs text-accent hover:underline mt-1"
               >
-                {systemPromptExpanded ? 'Show less' : 'Show more'}
+                {systemPromptExpanded ? 'Ver menos' : 'Ver mais'}
               </button>
             </Card>
           </div>
 
           {/* Stats */}
           <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">Stats</p>
+            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">Estatísticas</p>
             <div className="grid grid-cols-2 gap-2">
               <Card padding="sm" className="text-center bg-bg-primary">
                 <p className="text-lg font-bold text-text-primary">{messages.length}</p>
-                <p className="text-[10px] text-text-tertiary">Messages</p>
+                <p className="text-[10px] text-text-tertiary">Mensagens</p>
               </Card>
               <Card padding="sm" className="text-center bg-bg-primary">
                 <p className="text-lg font-bold text-text-primary">{totalTokens.toLocaleString()}</p>
@@ -316,7 +316,7 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <path d="M11.5 2.5l2 2M2 14l1-4L11.5 1.5l2 2L5 12l-4 1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
               </svg>
-              Edit Agent
+              Editar Agente
             </Button>
           </Link>
         </div>

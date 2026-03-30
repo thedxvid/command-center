@@ -15,9 +15,9 @@ export default function AgentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Agents</h1>
+          <h1 className="text-2xl font-bold text-text-primary">Agentes</h1>
           <p className="text-sm text-text-secondary mt-1">
-            {mockAgents.length} agents configured
+            {mockAgents.length} agentes configurados
           </p>
         </div>
         <Link href="/agents/new">
@@ -25,7 +25,7 @@ export default function AgentsPage() {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-            New Agent
+            Novo Agente
           </Button>
         </Link>
       </div>
@@ -94,7 +94,7 @@ export default function AgentsPage() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                    Chat
+                    Conversar
                   </Button>
                 </div>
               </Card>

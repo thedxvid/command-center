@@ -10,11 +10,11 @@ interface ApiField {
 }
 
 const apiFields: ApiField[] = [
-  { key: 'anthropicKey', label: 'Anthropic API Key', placeholder: 'sk-ant-...' },
-  { key: 'elevenLabsKey', label: 'ElevenLabs API Key', placeholder: 'Enter your ElevenLabs key' },
-  { key: 'nanoBananaEndpoint', label: 'Nano Banana 2 Endpoint', placeholder: 'https://api.nanobanana.com/v2' },
-  { key: 'obsidianUrl', label: 'Obsidian REST API URL', placeholder: 'http://localhost:27124' },
-  { key: 'obsidianKey', label: 'Obsidian API Key', placeholder: 'Enter your Obsidian API key' },
+  { key: 'anthropicKey', label: 'Chave API Anthropic', placeholder: 'sk-ant-...' },
+  { key: 'elevenLabsKey', label: 'Chave API ElevenLabs', placeholder: 'Insira sua chave ElevenLabs' },
+  { key: 'nanoBananaEndpoint', label: 'Endpoint Nano Banana 2', placeholder: 'https://api.nanobanana.com/v2' },
+  { key: 'obsidianUrl', label: 'URL REST API Obsidian', placeholder: 'http://localhost:27124' },
+  { key: 'obsidianKey', label: 'Chave API Obsidian', placeholder: 'Insira sua chave API Obsidian' },
 ];
 
 interface ServiceStatus {
@@ -24,11 +24,11 @@ interface ServiceStatus {
 }
 
 const services: ServiceStatus[] = [
-  { name: 'Claude API', status: 'unknown', label: 'Not configured' },
-  { name: 'Obsidian', status: 'unknown', label: 'Not configured' },
-  { name: 'Whisper', status: 'unknown', label: 'Not configured' },
-  { name: 'ElevenLabs', status: 'unknown', label: 'Not configured' },
-  { name: 'Nano Banana 2', status: 'unknown', label: 'Not configured' },
+  { name: 'Claude API', status: 'unknown', label: 'Não configurado' },
+  { name: 'Obsidian', status: 'unknown', label: 'Não configurado' },
+  { name: 'Whisper', status: 'unknown', label: 'Não configurado' },
+  { name: 'ElevenLabs', status: 'unknown', label: 'Não configurado' },
+  { name: 'Nano Banana 2', status: 'unknown', label: 'Não configurado' },
 ];
 
 const statusDotColors: Record<string, string> = {
@@ -55,13 +55,13 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-3xl">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
-        <p className="text-sm text-text-secondary mt-1">Configure API keys, services, and preferences</p>
+        <h1 className="text-2xl font-bold text-text-primary">Configurações</h1>
+        <p className="text-sm text-text-secondary mt-1">Configure chaves de API, serviços e preferências</p>
       </div>
 
       {/* API Configuration */}
       <Card>
-        <h2 className="text-base font-semibold text-text-primary mb-5">API Configuration</h2>
+        <h2 className="text-base font-semibold text-text-primary mb-5">Configuração de APIs</h2>
         <div className="space-y-4">
           {apiFields.map((field) => (
             <div key={field.key} className="relative">
@@ -76,7 +76,7 @@ export default function SettingsPage() {
                 type="button"
                 onClick={() => toggleVisibility(field.key)}
                 className="absolute right-3 top-[38px] text-text-tertiary hover:text-text-primary transition-colors"
-                aria-label={visibleFields[field.key] ? 'Hide' : 'Show'}
+                aria-label={visibleFields[field.key] ? 'Ocultar' : 'Mostrar'}
               >
                 {visibleFields[field.key] ? (
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -93,13 +93,13 @@ export default function SettingsPage() {
           ))}
         </div>
         <div className="mt-5 flex justify-end">
-          <Button variant="primary" size="md">Save API Keys</Button>
+          <Button variant="primary" size="md">Salvar Chaves de API</Button>
         </div>
       </Card>
 
       {/* Service Status */}
       <Card>
-        <h2 className="text-base font-semibold text-text-primary mb-5">Service Status</h2>
+        <h2 className="text-base font-semibold text-text-primary mb-5">Status dos Serviços</h2>
         <div className="space-y-3">
           {services.map((service) => (
             <div
@@ -123,22 +123,22 @@ export default function SettingsPage() {
 
       {/* Preferences */}
       <Card>
-        <h2 className="text-base font-semibold text-text-primary mb-5">Preferences</h2>
+        <h2 className="text-base font-semibold text-text-primary mb-5">Preferências</h2>
         <div className="space-y-5">
           {/* Theme */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-text-primary">Theme</p>
-              <p className="text-xs text-text-secondary">Managed via the header toggle</p>
+              <p className="text-sm font-medium text-text-primary">Tema</p>
+              <p className="text-xs text-text-secondary">Gerenciado pelo botão no cabeçalho</p>
             </div>
-            <Badge variant="default" size="md">System</Badge>
+            <Badge variant="default" size="md">Sistema</Badge>
           </div>
 
           {/* Voice Auto-play */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-text-primary">Voice Auto-play</p>
-              <p className="text-xs text-text-secondary">Automatically play agent voice responses</p>
+              <p className="text-sm font-medium text-text-primary">Reprodução Automática de Voz</p>
+              <p className="text-xs text-text-secondary">Reproduzir automaticamente respostas de voz dos agentes</p>
             </div>
             <button
               type="button"
@@ -160,8 +160,8 @@ export default function SettingsPage() {
           {/* Default Model */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-text-primary">Default Model</p>
-              <p className="text-xs text-text-secondary">Model used for new agent configurations</p>
+              <p className="text-sm font-medium text-text-primary">Modelo Padrão</p>
+              <p className="text-xs text-text-secondary">Modelo usado para novas configurações de agentes</p>
             </div>
             <select
               value={defaultModel}

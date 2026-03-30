@@ -300,8 +300,8 @@ export default function VaultPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Vault Explorer</h1>
-          <p className="text-sm text-text-secondary mt-1">Browse and search your Obsidian vault</p>
+          <h1 className="text-2xl font-bold text-text-primary">Explorador do Vault</h1>
+          <p className="text-sm text-text-secondary mt-1">Navegue e pesquise seu vault do Obsidian</p>
         </div>
       </div>
 
@@ -321,7 +321,7 @@ export default function VaultPage() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search notes, folders, content..."
+          placeholder="Buscar notas, pastas, conteúdo..."
           className="w-full h-12 pl-10 pr-4 text-sm bg-bg-elevated border border-border rounded-[var(--radius-lg)] text-text-primary placeholder:text-text-tertiary outline-none transition-all duration-150 focus:border-accent focus:ring-2 focus:ring-accent/20"
         />
       </div>
@@ -330,7 +330,7 @@ export default function VaultPage() {
       <div className="flex items-center gap-2">
         <Badge variant="warning" size="md">
           <span className="w-2 h-2 rounded-full bg-amber-500 mr-1.5 inline-block" />
-          Not connected — Install Obsidian Local REST API plugin
+          Não conectado — Instale o plugin Obsidian Local REST API
         </Badge>
       </div>
 
@@ -339,7 +339,7 @@ export default function VaultPage() {
         {/* Folder tree */}
         <div className="w-[300px] shrink-0 border-r border-border bg-bg-elevated overflow-y-auto p-3">
           <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2 px-2">
-            Vault Structure
+            Estrutura do Vault
           </p>
           <FolderTree
             items={mockVaultTree}
@@ -372,7 +372,7 @@ export default function VaultPage() {
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <p className="text-sm">Select a note to preview</p>
+              <p className="text-sm">Selecione uma nota para visualizar</p>
             </div>
           )}
         </div>

@@ -7,7 +7,7 @@ import ClaudeMascot from '@/components/ui/ClaudeMascot';
 
 const navItems = [
   {
-    label: 'Dashboard',
+    label: 'Painel',
     href: '/',
     icon: (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -19,7 +19,7 @@ const navItems = [
     ),
   },
   {
-    label: 'Agents',
+    label: 'Agentes',
     href: '/agents',
     icon: (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -41,7 +41,7 @@ const navItems = [
     ),
   },
   {
-    label: 'Creative Studio',
+    label: 'Estúdio Criativo',
     href: '/creative',
     icon: (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -64,7 +64,7 @@ const navItems = [
     ),
   },
   {
-    label: 'Settings',
+    label: 'Configurações',
     href: '/settings',
     icon: (
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -88,7 +88,7 @@ export default function Sidebar() {
         <ClaudeMascot size={32} variant="happy" />
         <div>
           <h1 className="text-sm font-bold text-text-primary leading-tight">Command Center</h1>
-          <p className="text-[10px] text-text-tertiary">AI Agent System</p>
+          <p className="text-[10px] text-text-tertiary">Sistema de Agentes IA</p>
         </div>
       </div>
 

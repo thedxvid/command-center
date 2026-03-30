@@ -95,9 +95,9 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
   if (!squad) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-text-secondary">Squad not found</p>
+        <p className="text-text-secondary">Squad não encontrado</p>
         <Link href="/squads">
-          <Button variant="secondary">Back to Squads</Button>
+          <Button variant="secondary">Voltar para Squads</Button>
         </Link>
       </div>
     );
@@ -124,7 +124,7 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
 
         <div className="p-3 flex-1 overflow-y-auto">
           <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2 px-1">
-            Agents ({squad.agents.length})
+            Agentes ({squad.agents.length})
           </p>
           <div className="flex flex-col gap-1">
             {squad.agents.map((agent) => (
@@ -158,7 +158,7 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              Back to Squads
+              Voltar para Squads
             </Button>
           </Link>
         </div>
@@ -173,7 +173,7 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
             style={{ backgroundColor: squad.color || 'var(--accent)' }}
           />
           <h1 className="text-base font-semibold text-text-primary">{squad.name}</h1>
-          <Badge variant="accent" size="sm">{squad.agents.length} agents</Badge>
+          <Badge variant="accent" size="sm">{squad.agents.length} agentes</Badge>
         </div>
 
         {/* Messages */}
@@ -224,7 +224,7 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
               <textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder={`Message ${squad.name}...`}
+                placeholder={`Mensagem para ${squad.name}...`}
                 rows={1}
                 className="w-full px-4 py-3 text-sm bg-bg-primary border border-border rounded-[var(--radius-lg)] text-text-primary placeholder:text-text-tertiary outline-none resize-none transition-all duration-150 focus:border-accent focus:ring-2 focus:ring-accent/20"
                 onKeyDown={(e) => {
@@ -241,7 +241,7 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
             </Button>
           </div>
           <p className="text-[11px] text-text-tertiary mt-2">
-            All {squad.agents.length} agents will collaborate on your request
+            Todos os {squad.agents.length} agentes vão colaborar na sua solicitação
           </p>
         </div>
       </div>

@@ -4,12 +4,12 @@ import { usePathname } from 'next/navigation';
 import { useUIStore } from '@/stores/uiStore';
 
 const pageTitles: Record<string, string> = {
-  '/': 'Dashboard',
-  '/agents': 'Agents',
+  '/': 'Painel',
+  '/agents': 'Agentes',
   '/squads': 'Squads',
-  '/creative': 'Creative Studio',
+  '/creative': 'Estúdio Criativo',
   '/vault': 'Vault',
-  '/settings': 'Settings',
+  '/settings': 'Configurações',
 };
 
 export default function Header() {
@@ -53,7 +53,7 @@ export default function Header() {
               ? 'bg-accent text-white'
               : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary'
           }`}
-          title={voiceMode ? 'Voice mode ON' : 'Voice mode OFF'}
+          title={voiceMode ? 'Modo voz LIGADO' : 'Modo voz DESLIGADO'}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <rect x="6.5" y="2" width="5" height="9" rx="2.5" stroke="currentColor" strokeWidth="1.5" />
@@ -66,7 +66,7 @@ export default function Header() {
         <button
           onClick={toggleTheme}
           className="p-2 rounded-[var(--radius-sm)] text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
-          title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          title={`Mudar para modo ${theme === 'light' ? 'escuro' : 'claro'}`}
         >
           {theme === 'light' ? (
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
