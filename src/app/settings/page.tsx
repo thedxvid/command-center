@@ -15,6 +15,7 @@ const apiFields: ApiField[] = [
   { key: 'nanoBananaEndpoint', label: 'Endpoint Nano Banana 2', placeholder: 'https://api.nanobanana.com/v2' },
   { key: 'obsidianUrl', label: 'URL REST API Obsidian', placeholder: 'http://localhost:27124' },
   { key: 'obsidianKey', label: 'Chave API Obsidian', placeholder: 'Insira sua chave API Obsidian' },
+  { key: 'firecrawlKey', label: 'Chave API Firecrawl', placeholder: 'fc-...' },
 ];
 
 interface ServiceStatus {
@@ -29,6 +30,7 @@ const services: ServiceStatus[] = [
   { name: 'Whisper', status: 'unknown', label: 'Não configurado' },
   { name: 'ElevenLabs', status: 'unknown', label: 'Não configurado' },
   { name: 'Nano Banana 2', status: 'unknown', label: 'Não configurado' },
+  { name: 'Firecrawl', status: 'unknown', label: 'Não configurado' },
 ];
 
 const statusDotColors: Record<string, string> = {
