@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { firecrawl } from '@/lib/firecrawl';
+import { getFirecrawl } from '@/lib/firecrawl';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Query é obrigatória' }, { status: 400 });
     }
 
-    const result = await firecrawl.search(query, { limit });
+    const result = await getFirecrawl().search(query, { limit });
 
     return NextResponse.json(result);
   } catch (error: unknown) {
