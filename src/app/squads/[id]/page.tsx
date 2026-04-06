@@ -1,96 +1,25 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, Button, Badge } from '@/components/ui';
 import { mockSquads } from '@/lib/mockData';
 import type { Message } from '@/types';
 
-const mockSquadMessages: (Message & { agentName?: string; agentAvatar?: string })[] = [
-  {
-    id: 'sq-msg-1',
-    conversationId: 'squad-conv-1',
-    role: 'user',
-    content: 'Preciso de uma campanha completa sobre produtividade. Roteiro de reels, carrossel e copy para ads.',
-    createdAt: new Date('2026-03-25T14:00:00'),
-  },
-  {
-    id: 'sq-msg-2',
-    conversationId: 'squad-conv-1',
-    role: 'assistant',
-    content: `## Roteiro de Reels: Produtividade Real
-
-**Hook (0-3s):** "Para de fingir que tá produzindo..."
-
-**Desenvolvimento (3-25s):**
-1. Fecha todas as abas que não precisa
-2. Coloca o celular no modo foco
-3. Define UMA meta pro próximo bloco de 90 min
-4. Trabalha sem parar até o timer tocar
-
-**CTA (25-30s):** "Testa isso agora e me conta nos comentários."
-
-*Formato: talking head + b-roll de tela, cortes rápidos*`,
-    agentId: 'agent-1',
-    agentName: 'Roteirizador',
-    agentAvatar: '🎬',
-    metadata: { tokensUsed: 245, model: 'claude-sonnet-4-20250514', latencyMs: 1800 },
-    createdAt: new Date('2026-03-25T14:00:04'),
-  },
-  {
-    id: 'sq-msg-3',
-    conversationId: 'squad-conv-1',
-    role: 'assistant',
-    content: `## Carrossel: 5 Hábitos de Quem é Realmente Produtivo
-
-**Slide 1 (Capa):** "5 Hábitos que Mudaram Minha Produtividade"
-_Visual: Fundo escuro, tipografia bold_
-
-**Slide 2:** "1. Bloco de 90 minutos sem interrupção"
-_Visual: Timer minimalista_
-
-**Slide 3:** "2. Lista de 3 prioridades, não 30 tarefas"
-_Visual: Checklist com 3 items_
-
-**Slide 4:** "3. Celular no modo avião durante deep work"
-_Visual: Celular com ícone de avião_
-
-**Slide 5:** "4. Review semanal todo domingo"
-_Visual: Calendário_
-
-**Slide 6 (CTA):** "Qual desses você já faz? Comenta o número!"`,
-    agentId: 'agent-2',
-    agentName: 'Carrossel Master',
-    agentAvatar: '🎠',
-    metadata: { tokensUsed: 320, model: 'claude-sonnet-4-20250514', latencyMs: 2200 },
-    createdAt: new Date('2026-03-25T14:00:08'),
-  },
-  {
-    id: 'sq-msg-4',
-    conversationId: 'squad-conv-1',
-    role: 'assistant',
-    content: `## Viral Hook Analysis
-
-Analisei os top 50 reels sobre produtividade dessa semana. Tendências:
-
-- **"Para de..."** hooks têm 3.2x mais saves
-- **Formato lista** (3-5 itens) performa melhor que tutorial longo
-- **Horário ideal**: 7h-8h e 18h-19h (seu público)
-- **Duração sweet spot**: 18-25 segundos
-
-Recomendo combinar o roteiro do Roteirizador com o carrossel do Carrossel Master e publicar no mesmo dia pra maximizar alcance.`,
-    agentId: 'agent-4',
-    agentName: 'Viral Content',
-    agentAvatar: '🔥',
-    metadata: { tokensUsed: 198, model: 'claude-sonnet-4-20250514', latencyMs: 2800 },
-    createdAt: new Date('2026-03-25T14:00:12'),
-  },
-];
+type SquadMessage = Message & { agentName?: string; agentAvatar?: string };
 
 export default function SquadChatPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const squad = mockSquads.find((s) => s.id === id);
   const [inputValue, setInputValue] = useState('');
+  const [messages, setMessages] = useState<SquadMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   if (!squad) {
     return (
@@ -101,6 +30,101 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
         </Link>
       </div>
     );
+  }
+
+  async function handleSend() {
+    if (!inputValue.trim() || isLoading) return;
+
+    const userContent = inputValue.trim();
+    setInputValue('');
+    setIsLoading(true);
+
+    const userMsg: SquadMessage = {
+      id: `user-${Date.now()}`,
+      conversationId: conversationId || '',
+      role: 'user',
+      content: userContent,
+      createdAt: new Date(),
+    };
+    setMessages((prev) => [...prev, userMsg]);
+
+    try {
+      const res = await fetch('/api/squads/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ squadId: id, message: userContent, conversationId }),
+      });
+
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error ?? 'Erro ao contatar a squad');
+      }
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let currentAgentMsgId: string | null = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const lines = decoder.decode(value).split('\n').filter((l) => l.startsWith('data: '));
+
+        for (const line of lines) {
+          let data: Record<string, unknown>;
+          try { data = JSON.parse(line.slice(6)); } catch { continue; }
+
+          if (data.agentStart) {
+            const start = data.agentStart as { id: string; name: string; avatar: string };
+            currentAgentMsgId = `agent-${start.id}-${Date.now()}`;
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: currentAgentMsgId!,
+                conversationId: conversationId || '',
+                role: 'assistant',
+                content: '',
+                agentId: start.id,
+                agentName: start.name,
+                agentAvatar: start.avatar,
+                createdAt: new Date(),
+              },
+            ]);
+          } else if (data.text && currentAgentMsgId) {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === currentAgentMsgId ? { ...m, content: m.content + (data.text as string) } : m
+              )
+            );
+          } else if (data.agentDone && currentAgentMsgId) {
+            const done = data.agentDone as { tokensUsed: number; latencyMs: number };
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === currentAgentMsgId
+                  ? { ...m, metadata: { tokensUsed: done.tokensUsed, latencyMs: done.latencyMs } }
+                  : m
+              )
+            );
+            currentAgentMsgId = null;
+          } else if (data.done) {
+            setConversationId(data.conversationId as string);
+          }
+        }
+      }
+    } catch (e) {
+      const errMsg: SquadMessage = {
+        id: `err-${Date.now()}`,
+        conversationId: conversationId || '',
+        role: 'assistant',
+        content: e instanceof Error ? e.message : 'Erro desconhecido',
+        agentName: 'Sistema',
+        agentAvatar: '⚠️',
+        createdAt: new Date(),
+      };
+      setMessages((prev) => [...prev, errMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -178,10 +202,17 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
-          {mockSquadMessages.map((msg) => (
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full gap-2 text-center">
+              <p className="text-text-secondary text-sm">
+                Envie uma mensagem para acionar todos os agentes da squad.
+              </p>
+            </div>
+          )}
+
+          {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[75%] ${msg.role === 'user' ? '' : ''}`}>
-                {/* Agent badge for assistant messages */}
+              <div className="max-w-[75%]">
                 {msg.role === 'assistant' && msg.agentName && (
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <span className="text-base leading-none">{msg.agentAvatar}</span>
@@ -198,10 +229,15 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
                       : 'bg-bg-elevated border border-border rounded-tl-sm'
                   }`}
                 >
-                  {msg.content}
+                  {msg.content || (
+                    <span className="inline-flex gap-1 text-text-tertiary">
+                      <span className="animate-pulse">•</span>
+                      <span className="animate-pulse [animation-delay:150ms]">•</span>
+                      <span className="animate-pulse [animation-delay:300ms]">•</span>
+                    </span>
+                  )}
                 </div>
 
-                {/* Metadata */}
                 {msg.metadata && (
                   <div className="flex items-center gap-2 mt-1 px-1">
                     <span className="text-[10px] text-text-tertiary">
@@ -215,6 +251,16 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
               </div>
             </div>
           ))}
+
+          {isLoading && messages[messages.length - 1]?.role === 'user' && (
+            <div className="flex justify-start">
+              <div className="px-4 py-3 rounded-[var(--radius-lg)] bg-bg-elevated border border-border text-sm text-text-tertiary">
+                Acionando agentes...
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input area */}
@@ -226,15 +272,17 @@ export default function SquadChatPage({ params }: { params: Promise<{ id: string
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={`Mensagem para ${squad.name}...`}
                 rows={1}
-                className="w-full px-4 py-3 text-sm bg-bg-primary border border-border rounded-[var(--radius-lg)] text-text-primary placeholder:text-text-tertiary outline-none resize-none transition-all duration-150 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                disabled={isLoading}
+                className="w-full px-4 py-3 text-sm bg-bg-primary border border-border rounded-[var(--radius-lg)] text-text-primary placeholder:text-text-tertiary outline-none resize-none transition-all duration-150 focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-50"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
+                    handleSend();
                   }
                 }}
               />
             </div>
-            <Button size="md" disabled={!inputValue.trim()}>
+            <Button size="md" disabled={!inputValue.trim() || isLoading} onClick={handleSend}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M14 2L7 9M14 2L9.5 14L7 9M14 2L2 6.5L7 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>

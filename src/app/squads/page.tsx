@@ -1,10 +1,29 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Card, Button, Badge } from '@/components/ui';
 import { mockSquads } from '@/lib/mockData';
 
 export default function SquadsPage() {
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<string | null>(null);
+
+  async function handleImport() {
+    setImporting(true);
+    setImportResult(null);
+    try {
+      const res = await fetch('/api/squads/import', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Erro ao importar');
+      setImportResult(`${data.imported} squad(s) importada(s) com sucesso`);
+    } catch (e) {
+      setImportResult(e instanceof Error ? e.message : 'Erro desconhecido');
+    } finally {
+      setImporting(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
@@ -15,12 +34,23 @@ export default function SquadsPage() {
             {mockSquads.length} squads configurados
           </p>
         </div>
-        <Button>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          Novo Squad
-        </Button>
+        <div className="flex items-center gap-2">
+          {importResult && (
+            <span className="text-xs text-text-secondary">{importResult}</span>
+          )}
+          <Button variant="secondary" onClick={handleImport} disabled={importing}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2v8M5 7l3 3 3-3M3 12h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {importing ? 'Importando...' : 'Importar Squads'}
+          </Button>
+          <Button>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            Novo Squad
+          </Button>
+        </div>
       </div>
 
       {/* Grid */}
