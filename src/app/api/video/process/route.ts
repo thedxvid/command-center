@@ -2,18 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir, unlink } from "fs/promises";
 import { createReadStream, existsSync } from "fs";
 import path from "path";
-import ffmpeg from "fluent-ffmpeg";
-import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-const TMP_DIR = path.join(process.cwd(), "tmp");
-
-async function ensureTmpDir() {
-  if (!existsSync(TMP_DIR)) await mkdir(TMP_DIR, { recursive: true });
+async function getTmpDir() {
+  const dir = path.join(process.cwd(), "tmp");
+  if (!existsSync(dir)) await mkdir(dir, { recursive: true });
+  return dir;
 }
 
 async function extractAudio(videoPath: string, audioPath: string): Promise<void> {
+  const ffmpeg = (await import("fluent-ffmpeg")).default;
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
       .noVideo()
@@ -28,6 +25,7 @@ async function extractAudio(videoPath: string, audioPath: string): Promise<void>
 }
 
 async function getVideoDuration(videoPath: string): Promise<number> {
+  const ffmpeg = (await import("fluent-ffmpeg")).default;
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(videoPath, (err, meta) => {
       if (err) reject(err);
@@ -37,7 +35,7 @@ async function getVideoDuration(videoPath: string): Promise<number> {
 }
 
 export async function POST(req: NextRequest) {
-  await ensureTmpDir();
+  const tmpDir = await getTmpDir();
 
   const formData = await req.formData();
   const file = formData.get("video") as File | null;
@@ -46,21 +44,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nenhum vídeo enviado" }, { status: 400 });
   }
 
-  const videoPath = path.join(TMP_DIR, `video_${Date.now()}_${file.name}`);
+  const videoPath = path.join(tmpDir, `video_${Date.now()}_${file.name}`);
   const audioPath = videoPath.replace(/\.[^.]+$/, ".wav");
 
   try {
-    // Salva o vídeo no disco temporariamente
     const buffer = Buffer.from(await file.arrayBuffer());
     await writeFile(videoPath, buffer);
 
-    // Extrai o áudio
     await extractAudio(videoPath, audioPath);
-
-    // Duração total do vídeo
     const durationSeconds = await getVideoDuration(videoPath);
 
-    // Transcreve com Whisper (word-level timestamps)
+    const { default: OpenAI } = await import("openai");
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
     const transcription = await openai.audio.transcriptions.create({
       file: createReadStream(audioPath) as unknown as File,
       model: "whisper-1",
@@ -68,7 +64,6 @@ export async function POST(req: NextRequest) {
       timestamp_granularities: ["word", "segment"],
     });
 
-    // Monta captions no formato do @remotion/captions
     const captions = (transcription.words ?? []).map((w) => ({
       text: w.word,
       startMs: Math.round(w.start * 1000),
@@ -77,13 +72,11 @@ export async function POST(req: NextRequest) {
       confidence: 1 as number | null,
     }));
 
-    // Segmentos como pontos de corte sugeridos (pausas entre falas)
     const segments = (transcription.segments ?? []).map((s, i) => ({
       index: i,
       text: s.text.trim(),
       startMs: Math.round(s.start * 1000),
       endMs: Math.round(s.end * 1000),
-      // Se a pausa antes deste segmento for > 1s, marca como ponto de corte
       isCutPoint:
         i > 0
           ? s.start - (transcription.segments![i - 1]?.end ?? s.start) > 1.0
@@ -98,13 +91,8 @@ export async function POST(req: NextRequest) {
       fileName: file.name,
     });
   } finally {
-    // Limpa os temporários
     for (const p of [videoPath, audioPath]) {
       if (existsSync(p)) await unlink(p).catch(() => {});
     }
   }
 }
-
-export const config = {
-  api: { bodyParser: false },
-};

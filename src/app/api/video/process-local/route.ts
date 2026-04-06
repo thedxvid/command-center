@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir, unlink } from "fs/promises";
+import { mkdir, unlink } from "fs/promises";
 import { createReadStream, existsSync } from "fs";
 import path from "path";
-import ffmpeg from "fluent-ffmpeg";
-import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-const TMP_DIR = path.join(process.cwd(), "tmp");
-const VIDEOS_DIR = path.join(process.cwd(), "videos para editar");
-
-async function ensureTmpDir() {
-  if (!existsSync(TMP_DIR)) await mkdir(TMP_DIR, { recursive: true });
+async function getTmpDir() {
+  const dir = path.join(process.cwd(), "tmp");
+  if (!existsSync(dir)) await mkdir(dir, { recursive: true });
+  return dir;
 }
 
 async function extractAudio(videoPath: string, audioPath: string): Promise<void> {
+  const ffmpeg = (await import("fluent-ffmpeg")).default;
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
       .noVideo()
@@ -29,6 +25,7 @@ async function extractAudio(videoPath: string, audioPath: string): Promise<void>
 }
 
 async function getVideoDuration(videoPath: string): Promise<number> {
+  const ffmpeg = (await import("fluent-ffmpeg")).default;
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(videoPath, (err, meta) => {
       if (err) reject(err);
@@ -38,23 +35,23 @@ async function getVideoDuration(videoPath: string): Promise<number> {
 }
 
 export async function POST(req: NextRequest) {
-  await ensureTmpDir();
+  const tmpDir = await getTmpDir();
+  const videosDir = path.join(process.cwd(), "videos para editar");
 
-  const { fileName } = await req.json() as { fileName: string };
+  const { fileName } = (await req.json()) as { fileName: string };
 
   if (!fileName) {
     return NextResponse.json({ error: "fileName é obrigatório" }, { status: 400 });
   }
 
-  // Garante que não há path traversal
   const safeFileName = path.basename(fileName);
-  const videoPath = path.join(VIDEOS_DIR, safeFileName);
+  const videoPath = path.join(videosDir, safeFileName);
 
   if (!existsSync(videoPath)) {
     return NextResponse.json({ error: `Arquivo não encontrado: ${safeFileName}` }, { status: 404 });
   }
 
-  const audioPath = path.join(TMP_DIR, `audio_${Date.now()}.wav`);
+  const audioPath = path.join(tmpDir, `audio_${Date.now()}.wav`);
 
   try {
     console.log(`[process-local] Extraindo áudio de ${safeFileName}...`);
@@ -63,6 +60,10 @@ export async function POST(req: NextRequest) {
     const durationSeconds = await getVideoDuration(videoPath);
 
     console.log(`[process-local] Enviando para Whisper... (${(durationSeconds / 60).toFixed(1)} min)`);
+
+    const { default: OpenAI } = await import("openai");
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
     const transcription = await openai.audio.transcriptions.create({
       file: createReadStream(audioPath) as unknown as File,
       model: "whisper-1",
@@ -95,8 +96,7 @@ export async function POST(req: NextRequest) {
       fullText: transcription.text,
       durationSeconds,
       fileName: safeFileName,
-      // src para usar direto no Remotion Studio (servido pelo publicDir)
-      remotionSrc: `${safeFileName}`,
+      remotionSrc: safeFileName,
     });
   } finally {
     if (existsSync(audioPath)) await unlink(audioPath).catch(() => {});
