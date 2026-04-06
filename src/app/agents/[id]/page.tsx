@@ -8,12 +8,7 @@ import Card from '@/components/ui/Card';
 import { mockAgents, mockSquads, mockMessages, mockConversations } from '@/lib/mockData';
 import type { Message } from '@/types';
 
-const MOCK_RESPONSES = [
-  'Entendido! Vou trabalhar nisso agora. Aqui está minha sugestão baseada no que você pediu...',
-  'Boa ideia! Deixa eu elaborar um pouco mais sobre esse tema e trazer algumas opções criativas.',
-  'Perfeito, analisei o contexto e tenho algumas recomendações. Veja o que acha dessas abordagens...',
-  'Interessante! Vou combinar isso com as melhores práticas que conheço para entregar algo bem impactante.',
-];
+// Mock removido — usando Claude API via /api/agents/chat
 
 export default function AgentChatPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -66,13 +61,17 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
     .filter((m) => m.metadata?.tokensUsed)
     .reduce((sum, m) => sum + (m.metadata?.tokensUsed || 0), 0);
 
-  const handleSend = () => {
+  const [activeConversationId, setActiveConversationId] = useState<string | undefined>(
+    conversation?.id
+  );
+
+  const handleSend = async () => {
     const text = inputValue.trim();
     if (!text || isTyping) return;
 
     const userMessage: Message = {
       id: `msg-${Date.now()}`,
-      conversationId: conversation?.id || 'conv-new',
+      conversationId: activeConversationId || 'conv-new',
       role: 'user',
       content: text,
       createdAt: new Date(),
@@ -80,32 +79,85 @@ export default function AgentChatPage({ params }: { params: Promise<{ id: string
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
-
-    // Reset textarea height
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
-
-    // Simulate typing
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsTyping(true);
-    setTimeout(() => {
-      const responseText = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
-      const assistantMessage: Message = {
-        id: `msg-${Date.now() + 1}`,
-        conversationId: conversation?.id || 'conv-new',
+
+    // Placeholder para streaming
+    const assistantId = `msg-${Date.now() + 1}`;
+    const startTime = Date.now();
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: assistantId,
+        conversationId: activeConversationId || 'conv-new',
         role: 'assistant',
-        content: responseText,
+        content: '',
         agentId: agent.id,
-        metadata: {
-          tokensUsed: Math.floor(Math.random() * 200) + 100,
-          model: agent.config.model || 'claude-sonnet-4-20250514',
-          latencyMs: Math.floor(Math.random() * 2000) + 1000,
-        },
         createdAt: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      } as Message,
+    ]);
+
+    try {
+      const res = await fetch('/api/agents/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: agent.id,
+          message: text,
+          conversationId: activeConversationId,
+          systemPrompt: agent.systemPrompt,
+          model: agent.config?.model || 'claude-sonnet-4-6',
+        }),
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const lines = decoder.decode(value).split('\n');
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = JSON.parse(line.slice(6));
+          if (data.text) {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId ? { ...m, content: m.content + data.text } : m
+              )
+            );
+          }
+          if (data.done) {
+            if (data.conversationId) setActiveConversationId(data.conversationId);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId
+                  ? {
+                      ...m,
+                      metadata: {
+                        tokensUsed: data.tokensUsed,
+                        latencyMs: Date.now() - startTime,
+                        model: agent.config?.model || 'claude-sonnet-4-6',
+                      },
+                    }
+                  : m
+              )
+            );
+          }
+        }
+      }
+    } catch (err) {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, content: `❌ Erro: ${err instanceof Error ? err.message : 'Falha na conexão'}` }
+            : m
+        )
+      );
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
